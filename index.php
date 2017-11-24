@@ -1,12 +1,11 @@
 <?php
-    require_once('config.php');
+    require_once(realpath(dirname(__FILE__).'/config.php'));    
+    require_once(realpath(dirname(__FILE__).'/includes/lib/functions.php'));
+    session_start();
 
-    if(!empty($_SESSION['access']) && !empty($_SESSION['username'])):
-        if(checkPermission($_SESSION['access']) == 'user')
-            header('Location: /user/index.php');
-        elseif(checkPermission($_SESSION['access']) == 'admin')
-            header('Location: /admin/index.php');
-    endif
+    if(isset($_SESSION['dbconnect']))
+        if($_SESSION['dbconnect']) 
+            header("Location: ".URL."/dashboard.php");
 ?>
 
 <!DOCTYPE HTML>
@@ -14,7 +13,7 @@
     <head>
         <title>PATRYK PANEK</title>
 
-        <link rel="stylesheet" type="text/css" href="./assets/css/<?php echo getDefaultStyle(); ?>" />
+        <link rel="stylesheet" href="assets/css/style.css"/>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     </head>
     <body class="home-main">
@@ -26,16 +25,13 @@
             </div>
             <div class="forms_container">
                 <div class="row">
+                    <div class="col-3"></div>
                     <div class="col-6">
                         <div class="login_form">
-                            <?php include('./views/login.php') ?>
+                            <?php include('./views/main/login.php') ?>
                         </div>
                     </div>
-                    <div class="col-6">
-                        <div class="register_form">
-                            <?php include('./views/register.php') ?>
-                        </div>
-                    </div>
+                    <div class="col-3"></div>
                 </div>
             </div>
     </body>

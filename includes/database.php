@@ -20,10 +20,10 @@
         }
 
         private function dbConnect() {
-                $this->DB = new MYSQLI($this->host, $this->user, $this->password,  $this->dbName);
+                $this->DB = @mysqli_connect($this->host, $this->user, $this->password,  $this->dbName);
 
                 if (!$this->DB) {
-                    die("Connection failed: " . mysqli_connect_error());
+                    $this->DB = null;
                 }
         }
 
