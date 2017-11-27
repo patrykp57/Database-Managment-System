@@ -71,6 +71,10 @@ function checkEnterInput(post_id) {
                 var input_value = this.value;
                 this.setAttribute('value', this.value);
                 this.setAttribute('name', this.value);
+
+                var json = JSON.parse(this.parentNode.parentNode.getAttribute('data-value'));
+                console.log(json);
+
                 setRecord(post_id, this.parentNode.getAttribute('data-id'), this.value);           
             }
         });

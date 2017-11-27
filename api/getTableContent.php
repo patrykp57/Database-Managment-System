@@ -31,7 +31,7 @@
                         <tbody>
                                 <?php  foreach($result as $key => $value):?>
 
-                                <tr data-id="<?php echo $key ?>">
+                                <tr data-id="<?php echo $key ?>" data-value='<?php echo json_encode($result[$key])?>' >
                                         <?php foreach($value as $key2 => $value2): ?>
 
                                         <td data-id="<?php echo $key2 ?>">
