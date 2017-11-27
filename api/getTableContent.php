@@ -16,31 +16,33 @@
 ?>
 
 
-<div class="table-show">
-        <table border="1">
-        <tr>
-            <?php foreach($columns as $key => $value): ?>
-                <td><?php echo $key.'. '.$value ?></td>
-            <?php endforeach ?>
-        </tr>
+        <div class="table-show">
+                <table class="table-records">
+                        <thead>
+                                <tr>
+                                        <?php foreach($columns as $key => $value): ?>
+                                        <td>
+                                                <?php echo $value ?>
+                                        </td>
+                                        <?php endforeach ?>
+                                </tr>
+                        </thead>
 
+                        <tbody>
+                                <?php  foreach($result as $key => $value):?>
 
-        <?php  foreach($result as $key => $value):?>     
-        
-        <tr>
-              <?php foreach($value as $key2 => $value2): ?>
-               
-                        <td data-id="<?php echo $key2 ?>"><input value="<?php echo $value2 ?>" name="<?php echo $value2 ?>" style="width: 100%"  class="input"/></td>
-                
-                <?php endforeach?>
-                </tr>
-        <?php endforeach ?>
-        
-        </table>
+                                <tr data-id="<?php echo $key ?>">
+                                        <?php foreach($value as $key2 => $value2): ?>
 
-</div>
+                                        <td data-id="<?php echo $key2 ?>">
+                                                <input value="<?php echo strip_tags($value2) ?>" name="<?php echo strip_tags($value2) ?>" style="width: 100%"
+                                                        class="input" />
+                                        </td>
 
+                                        <?php endforeach?>
+                                </tr>
+                                <?php endforeach ?>
+                        </tbody>
+                </table>
 
-
-
-
+        </div>

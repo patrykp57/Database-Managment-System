@@ -4,12 +4,13 @@
     session_start();
 
     if($_SESSION['dbconnect']) {
-        
+
         require_once(realpath(dirname(__FILE__).'/includes/user_database.php')); 
+
         $OBJ = new UserDatabase($_SESSION['db_host'], $_SESSION['db_user'], $_SESSION['db_password'], $_SESSION['db_name']);
         $USER_DB = $OBJ->returnConnection();
         $TABLES_LIST = $OBJ->returnTables();
-    } else {
+    }  else {
         header('Location: '.URL);
     }
 
@@ -18,21 +19,8 @@
 
 <?php include(realpath(dirname(__FILE__).'/views/user/_header.php'));?>
 
-
 <div class="container">
-
-
-    <div class="row query-container">
-        <div class="col-12">
-            <div class="form-query">
-                <h3>Zapytanie </h3>
-                <textarea id="form-query">SELECT * FROM ...</textarea>
-                <button type="submit" id="form-query-button">Wyślij</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="row list-container">
+    <div class="row">
         <div class="col-2">
             <?php foreach($TABLES_LIST as $key=>$value): ?>
             <div class="table-item" data-id="<?php echo $value ?>">
@@ -49,6 +37,4 @@
         </div>
     </div>
 </div>
-
-
 <?php include(realpath(dirname(__FILE__).'/views/user/_footer.php'));?>
