@@ -86,6 +86,56 @@
             }
         }
 
+        public function returnRecordsFromRange($id, $start) {
+            if($this->isConnected()) {
+                $stmt = $this->DB->prepare("SELECT * FROM ".$id." LIMIT ".$start.", 30");
+                $stmt->execute();
+                
+                $res = $stmt->get_result();
+                $result = array();
+
+                while($row = $res->fetch_assoc())
+                    $result[] = $row;
+                return $result;
+           
+       
+            } else {
+                return '';
+            }
+        }
+
+
+        public function returnSize($id) {
+            if($this->isConnected()):
+                if($stmt = $this->DB->query("SELECT * FROM ".$id)):
+                    $num = mysqli_num_rows($stmt);
+                    return $num;
+                endif;
+            else:
+                return 0;
+            endif;
+                
+        }
+
+        public function updateRecordFromArray($post_id, $insert_id, $value, $array) {
+            if($this->isConnected()) {
+                $stmt = $this->DB->prepare("UPDATE ? SET ? = ?");
+                $stmt->bind('sss', $post_id, $insert_id, $value);
+                $stmt->execute();
+                
+                $res = $stmt->get_result();
+                $result = array();
+
+                while($row = $res->fetch_assoc())
+                    $result[] = $row;
+                return $result;
+           
+       
+            } else {
+                return '';
+            }
+        }
+
         function __construct($host, $user, $password, $dbName) {
             $this->setConection($host, $user, $password, $dbName);
         }

@@ -341,3 +341,24 @@ textarea {
     font-size: 0.8rem;
     color: white;
 }
+
+.loader-records {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 50px;
+}
+.pagination .pagination-item {
+    color: black;
+    font-family: 'Roboto Condensed', sans-serif;
+    text-decoration: none;
+    font-size: 1.2rem;
+}
+
+.pagination .pagination-item:hover {
+    color: #d3d3d3;
+}
+.pagination .page-active {
+    color: #d3d3d3;
+    
+}

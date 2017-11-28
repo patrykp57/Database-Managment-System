@@ -1,4 +1,4 @@
-function getTable(url, post_id) {
+function getTable(url, post_id, start) {
     var xmlhttp = new XMLHttpRequest();
 
     xmlhttp.onreadystatechange = function () {
@@ -14,14 +14,37 @@ function getTable(url, post_id) {
         }
     };
 
-    xmlhttp.open("POST", url + post_id, true);
-    xmlhttp.send();
-}           // Ajax for show table content
+    xmlhttp.open("POST", url, true);
+    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xmlhttp.send("id=" + post_id + "&start=" + start);
+} // Ajax for show table content
+
+
+function getSize(url, post_id) {
+    var xmlhttp = new XMLHttpRequest();
+
+    xmlhttp.onreadystatechange = function () {
+        if (xmlhttp.readyState == XMLHttpRequest.DONE) { // XMLHttpRequest.DONE == 4
+            if (xmlhttp.status == 200) {
+                document.getElementById("table-pagination-content").innerHTML = xmlhttp.responseText;
+                paginationPages();
+            } else if (xmlhttp.status == 400) {
+                alert('Error 400');
+            } else {
+                alert('Error');
+            }
+        }
+    };
+
+    xmlhttp.open("POST", url, true);
+    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xmlhttp.send("id=" + post_id);
+}
 
 
 
 
-function setRecord(post_id, insert_id, value) {
+function setRecord(post_id, insert_id, value, json) {
     var xmlhttp = new XMLHttpRequest();
 
     xmlhttp.onreadystatechange = function () {
@@ -36,9 +59,10 @@ function setRecord(post_id, insert_id, value) {
         }
     };
 
-    xmlhttp.open("POST", "/api/setRecord.php?post_id=" + post_id + "&insert_id=" + insert_id + "&value=" + value, true);
-    xmlhttp.send();
-}  // Ajax for update field
+    xmlhttp.open("POST", "/api/setRecord.php", true);
+    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xmlhttp.send("post_id=" + post_id + "&insert_id=" + insert_id + "&value=" + value + "&json=" + json);
+} // Ajax for update field
 
 
 
@@ -48,7 +72,9 @@ for (var i = 0; i < clickTable.length; i++) {
     var element = clickTable[i];
     element.onclick = function () {
         var post_id = this.getAttribute("data-id");
-        getTable('/api/getTableContent.php?id=', post_id);
+        document.getElementById("table-content").innerHTML = "<img src='/assets/images/loader.gif' class='loader-records'/>";
+        getSize('/api/getTableSize.php?id=', post_id);
+        getTable('/api/getTableContent.php?id=', post_id, 0);
         changeFormValue(post_id);
         changeRecordActive(this, post_id);
         return false;
@@ -73,9 +99,9 @@ function checkEnterInput(post_id) {
                 this.setAttribute('name', this.value);
 
                 var json = JSON.parse(this.parentNode.parentNode.getAttribute('data-value'));
-                console.log(json);
+                json = JSON.stringify(json);
 
-                setRecord(post_id, this.parentNode.getAttribute('data-id'), this.value);           
+                setRecord(post_id, this.parentNode.getAttribute('data-id'), this.value, json);
             }
         });
     }
@@ -121,3 +147,36 @@ if (formQueryButton) {
         console.log(queryValue);
     }
 }
+
+// Query field
+
+
+
+function paginationPages() {
+    var clickTable = document.getElementsByClassName('pagination-item');
+
+    for (var i = 0; i < clickTable.length; i++) {
+        var element = clickTable[i];
+        element.onclick = function () {
+            var post_id = this.getAttribute("data-id");
+            var start = (this.getAttribute("data-value") * 30) - 30;
+            if (!this.classList.contains('page-active')) {
+                document.getElementById("table-content").innerHTML = "<img src='/assets/images/loader.gif' class='loader-records'/>";
+                getTable('/api/getTableContent.php?id=', post_id, start);
+                var clickActive = document.getElementsByClassName('page-active');            
+                for (var i = 0; i < clickTable.length; i++) {
+                    clickTable[i].classList.remove('page-active');
+                }
+                this.classList.add('page-active');
+              
+            }
+            return false;
+        };
+    }
+}
+
+
+
+
+
+// Pagination
