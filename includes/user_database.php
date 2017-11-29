@@ -119,17 +119,46 @@
 
         public function updateRecordFromArray($post_id, $insert_id, $value, $array) {
             if($this->isConnected()) {
-                $stmt = $this->DB->prepare("UPDATE ? SET ? = ?");
-                $stmt->bind('sss', $post_id, $insert_id, $value);
-                $stmt->execute();
+                $loop = 2*sizeof($array);
                 
-                $res = $stmt->get_result();
-                $result = array();
+                $query = "UPDATE ".$post_id." SET ".$insert_id." = '".$value."' WHERE ";
+                $types ='';
+                $where_array = array();
 
-                while($row = $res->fetch_assoc())
-                    $result[] = $row;
-                return $result;
-           
+                foreach($array as $key => $value): 
+                    $where_array[] = $key;
+                    $where_array[] = $value;
+
+                    $types.='s';
+                    if(is_numeric($value)):
+                        $types.='i';
+                    elseif(is_string($value)):
+                        $types.='s';
+                    elseif(is_double($value)):
+                        $types.='d';
+                    else:
+                        $types.='s';
+                    endif;
+                    
+                endforeach;
+
+                for($i = 0; $i< ($loop/2); $i++) {
+                    if($i == ($loop/2)-1):
+                        $query .= "? = ?";
+                    else:
+                        $query .= "? = ? AND ";
+                    endif;
+                }
+                return $where_array;
+                if($stmt = $this->DB->prepare($query)):
+                    $stmt->bind_param($types, ...$where_array);
+                    $stmt->execute();
+                    $stmt = $stmt->num_rows;
+                    return $stmt;
+                else:
+                    echo $this->DB->errno;
+                    
+                endif;
        
             } else {
                 return '';
