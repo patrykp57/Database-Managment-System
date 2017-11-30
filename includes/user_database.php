@@ -119,49 +119,111 @@
 
         public function updateRecordFromArray($post_id, $insert_id, $value, $array) {
             if($this->isConnected()) {
-                $loop = 2*sizeof($array);
+                $loop = sizeof($array);
                 
-                $query = "UPDATE ".$post_id." SET ".$insert_id." = '".$value."' WHERE ";
+                $query = "UPDATE ".$post_id." SET ".$insert_id." = ? WHERE ";
                 $types ='';
                 $where_array = array();
+                $where_array[] = $value;
+                $i = 0;
 
-                foreach($array as $key => $value): 
-                    $where_array[] = $key;
-                    $where_array[] = $value;
-
+                if(is_numeric($value)):
+                    $types.='i';
+                elseif(is_string($value)):
                     $types.='s';
+                else:
+                    $types.='s';
+                endif;
+
+
+
+                foreach($array as $key=>$value):
                     if(is_numeric($value)):
                         $types.='i';
-                    elseif(is_string($value)):
-                        $types.='s';
                     elseif(is_double($value)):
                         $types.='d';
+                    elseif(is_string($value)):
+                        $types.='s';
                     else:
                         $types.='s';
                     endif;
-                    
+
+                    if($i == $loop - 1):
+                        $query .= $key."=?";
+                    else:
+                        $query .= $key."=? AND ";
+                    endif;
+
+                    $where_array[] = $value;
+
+                    $i++;
                 endforeach;
 
-                for($i = 0; $i< ($loop/2); $i++) {
-                    if($i == ($loop/2)-1):
-                        $query .= "? = ?";
-                    else:
-                        $query .= "? = ? AND ";
-                    endif;
-                }
-                return $where_array;
+
+
+
                 if($stmt = $this->DB->prepare($query)):
                     $stmt->bind_param($types, ...$where_array);
                     $stmt->execute();
-                    $stmt = $stmt->num_rows;
-                    return $stmt;
+                  
+                    return true;
                 else:
-                    echo $this->DB->errno;
-                    
+                    return $this->DB->errno;             
                 endif;
        
             } else {
-                return '';
+                return false;
+            }
+        }
+
+
+
+        public function deleteRecordFromArray($post_id, $array) {
+            if($this->isConnected()) {
+                $loop = sizeof($array);
+                
+                $query = "DELETE FROM ".$post_id." WHERE ";
+                $types ='';
+                $where_array = array();
+                $i = 0;
+
+
+                foreach($array as $key=>$value):
+                    if(is_numeric($value)):
+                        $types.='i';
+                    elseif(is_double($value)):
+                        $types.='d';
+                    elseif(is_string($value)):
+                        $types.='s';
+                    else:
+                        $types.='s';
+                    endif;
+
+                    if($i == $loop - 1):
+                        $query .= $key."=?";
+                    else:
+                        $query .= $key."=? AND ";
+                    endif;
+
+                    $where_array[] = $value;
+
+                    $i++;
+                endforeach;
+
+
+        
+
+                if($stmt = $this->DB->prepare($query)):
+                    $stmt->bind_param($types, ...$where_array);
+                    $stmt->execute();
+                  
+                    return true;
+                else:
+                    return $this->DB->errno;             
+                endif;
+       
+            } else {
+                return false;
             }
         }
 

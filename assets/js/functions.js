@@ -6,6 +6,7 @@ function getTable(url, post_id, start) {
             if (xmlhttp.status == 200) {
                 document.getElementById("table-content").innerHTML = xmlhttp.responseText;
                 checkEnterInput(post_id);
+                deleteFunction(post_id);
             } else if (xmlhttp.status == 400) {
                 alert('Error 400');
             } else {
@@ -39,7 +40,7 @@ function getSize(url, post_id) {
     xmlhttp.open("POST", url, true);
     xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     xmlhttp.send("id=" + post_id);
-}
+}   // AJAX for get database size
 
 
 
@@ -50,7 +51,7 @@ function setRecord(post_id, insert_id, value, json) {
     xmlhttp.onreadystatechange = function () {
         if (xmlhttp.readyState == XMLHttpRequest.DONE) { // XMLHttpRequest.DONE == 4
             if (xmlhttp.status == 200) {
-                console.log(xmlhttp.responseText);
+                document.getElementById("info").innerHTML = xmlhttp.responseText;
             } else if (xmlhttp.status == 400) {
                 alert('Error 400');
             } else {
@@ -63,6 +64,32 @@ function setRecord(post_id, insert_id, value, json) {
     xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     xmlhttp.send("post_id=" + post_id + "&insert_id=" + insert_id + "&value=" + value + "&json=" + json);
 } // Ajax for update field
+
+
+
+function deleteRecord(post_id, element, json) {
+    var xmlhttp = new XMLHttpRequest();
+
+    xmlhttp.onreadystatechange = function () {
+        if (xmlhttp.readyState == XMLHttpRequest.DONE) { // XMLHttpRequest.DONE == 4
+            if (xmlhttp.status == 200) {
+                document.getElementById("info").innerHTML = xmlhttp.responseText;
+                element.remove();
+            } else if (xmlhttp.status == 400) {
+                alert('Error 400');
+            } else {
+                alert('Error');
+            }
+        }
+    };
+
+    xmlhttp.open("POST", "/api/deleteRecord.php", true);
+    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xmlhttp.send("post_id=" + post_id + "&json=" + json);
+} // Ajax for update field
+
+
+
 
 
 
@@ -139,6 +166,7 @@ function changeRecordActive(current, id) {
 
 
 var formQueryButton = document.getElementById('form-query-button');
+var formQuery = document.getElementById('form-query');
 
 
 if (formQueryButton) {
@@ -163,12 +191,12 @@ function paginationPages() {
             if (!this.classList.contains('page-active')) {
                 document.getElementById("table-content").innerHTML = "<img src='/assets/images/loader.gif' class='loader-records'/>";
                 getTable('/api/getTableContent.php?id=', post_id, start);
-                var clickActive = document.getElementsByClassName('page-active');            
+                var clickActive = document.getElementsByClassName('page-active');
                 for (var i = 0; i < clickTable.length; i++) {
                     clickTable[i].classList.remove('page-active');
                 }
                 this.classList.add('page-active');
-              
+
             }
             return false;
         };
@@ -177,6 +205,37 @@ function paginationPages() {
 
 
 
-
-
 // Pagination
+
+function deleteFunction(post_id) {
+    var deleteButton = document.getElementsByClassName('delete-button');
+
+
+    for (var i = 0; i < deleteButton.length; i++) {
+        var element = deleteButton[i];
+        element.onclick = function () {
+           var json = JSON.parse(this.parentNode.parentNode.getAttribute('data-value'));
+           json = JSON.stringify(json);
+           deleteRecord(post_id, this.parentNode.parentNode, json);
+        }
+    }
+}
+
+// Delete record
+
+
+var addInput = document.getElementsByClassName('add-input');
+var addObject = document.getElementsByClassName('type');
+
+
+addInput[0].onclick = function(e) {
+    e.preventDefault();
+    var copy = addObject[0].cloneNode(true);
+    document.getElementById('add-table-form').appendChild(copy);
+}
+
+
+
+
+
+// ADD table form add new value

@@ -43,6 +43,7 @@
             <?php endforeach?>
         </div>
         <div class="col-10">
+            <p id="info" class="warning"></p>
             <div class="table-content" id="table-content">
                 Kliknij na wybrany rekord, żeby zobaczyć zawartość.
             </div>

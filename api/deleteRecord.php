@@ -12,11 +12,11 @@
                 $JSON = json_decode($_POST['json'], true);
                 $OBJ = new UserDatabase($_SESSION['db_host'], $_SESSION['db_user'], $_SESSION['db_password'], $_SESSION['db_name']);
                 
-                $USER_DB = $OBJ->updateRecordFromArray($_POST['post_id'], $_POST['insert_id'], $_POST['value'], $JSON);
+                $USER_DB = $OBJ->deleteRecordFromArray($_POST['post_id'], $JSON);
 
-                
+              
                 if($USER_DB):
-                    echo "Rekord został zaktualizowany";
+                    echo "Rekord został usunięty!";
                 elseif(!$USER_DB):
                     echo "Błąd aktualizacji rekordu";
                 else:

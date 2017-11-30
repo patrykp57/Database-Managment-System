@@ -88,6 +88,10 @@ textarea {
     font-weight: bold;
 }
 
+#info {
+    padding-bottom: 20px;
+}
+
 .col-12,
 .col-10,
 .col-8,

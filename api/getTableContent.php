@@ -31,6 +31,9 @@
                                         <input value="<?php echo strip_tags($value2) ?>" name="<?php echo strip_tags($value2) ?>" style="width: 100%" class="input" />
                                 </td>
                                 <?php endforeach?>
+                                <td class="delete-cell">
+                                       <button class="delete-button">X</button>
+                                </td>
                         </tr>
                         <?php endforeach ?>
                 </tbody>
