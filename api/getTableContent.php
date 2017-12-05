@@ -23,7 +23,18 @@
                                 <?php endforeach ?>
                         </tr>
                 </thead>
-                <tbody>
+        
+                        <tr data-value='<?php echo json_encode($columns)?>'>
+                             <?php $inputNumber = sizeof($result[0]) ?>
+                             <?php if($inputNumber > 0): ?>
+                                <div id="addRecord">
+                                <?php for($i = 0; $i < $inputNumber; $i++):?>
+                                        <td> <input name="<?php echo $i ?>" class="addRecordInputs" /></td>
+                                <?php endfor ?>
+                                        <td><button id="addRecordButton">+</button></td>
+                                </div>
+                             <?php endif?>
+                        </tr>
                         <?php  foreach($result as $key => $value):?>
                         <tr data-id="<?php echo $key ?>" data-value='<?php echo json_encode($result[$key])?>'>
                                 <?php foreach($value as $key2 => $value2): ?>

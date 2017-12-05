@@ -9,21 +9,19 @@
             require_once(realpath(dirname(__FILE__).'/../includes/user_database.php')); 
             if (strpos(URL, $_SERVER["HTTP_ORIGIN"]) === 0): 
                 session_start();
-                $JSON = json_decode($_POST['json'], true);
                 $OBJ = new UserDatabase($_SESSION['db_host'], $_SESSION['db_user'], $_SESSION['db_password'], $_SESSION['db_name']);
-                
-                $USER_DB = $OBJ->updateRecordFromArray($_POST['post_id'], $_POST['insert_id'], $_POST['value'], $JSON);
+                $JSON = json_decode($_POST['value'], true);
+                $OUTPUT = array();
 
+                foreach($JSON as $key => $value) {
+                    if(!empty($value['name']))
+                        $OUTPUT[] = $value;
+
+                }
                 
-                if($USER_DB):
-                    echo "Rekord ".$_POST['insert_id']." został zaktualiowany o wartość ".$_POST['value'];
-                    echo "<br/>";
-                    echo print_r($USER_DB);
-                elseif(!$USER_DB):
-                    echo "Błąd aktualizacji rekordu"; 
-                else:
-                    echo  $USER_DB;
-                endif;
+                $DATA = $OBJ->createTable($OUTPUT);
+
+                echo $DATA;
             
 ?>
 

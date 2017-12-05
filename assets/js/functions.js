@@ -5,8 +5,11 @@ function getTable(url, post_id, start) {
         if (xmlhttp.readyState == XMLHttpRequest.DONE) { // XMLHttpRequest.DONE == 4
             if (xmlhttp.status == 200) {
                 document.getElementById("table-content").innerHTML = xmlhttp.responseText;
+                document.getElementById("info").innerHTML = '';
                 checkEnterInput(post_id);
                 deleteFunction(post_id);
+                addRecord();
+
             } else if (xmlhttp.status == 400) {
                 alert('Error 400');
             } else {
@@ -40,7 +43,7 @@ function getSize(url, post_id) {
     xmlhttp.open("POST", url, true);
     xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     xmlhttp.send("id=" + post_id);
-}   // AJAX for get database size
+} // AJAX for get database size
 
 
 
@@ -141,9 +144,11 @@ function checkEnterInput(post_id) {
 function changeFormValue(id) {
     var formQuery = document.getElementById('form-query');
     formQuery.value = "SELECT * FROM " + id;
-}
+} // Change form select VALUE
 
-// Change form select VALUE
+
+
+
 
 function removeAllActive() {
     var clickTable = document.getElementsByClassName('table-item');
@@ -170,15 +175,39 @@ var formQuery = document.getElementById('form-query');
 
 
 if (formQueryButton) {
-    formQueryButton.onclick = function () {
+    formQueryButton.onclick = function (e) {
+        e.preventDefault();
         var queryValue = formQuery.value;
-        console.log(queryValue);
+        querySelect('api/querySelect.php', formQuery.value);
     }
 }
 
 // Query field
 
+function querySelect(url, value) {
+    var xmlhttp = new XMLHttpRequest();
 
+    xmlhttp.onreadystatechange = function () {
+        if (xmlhttp.readyState == XMLHttpRequest.DONE) { // XMLHttpRequest.DONE == 4
+            if (xmlhttp.status == 200) {
+                document.getElementById("table-content").innerHTML = xmlhttp.responseText;
+                document.getElementById("info").innerHTML = '';
+            } else if (xmlhttp.status == 400) {
+                alert('Error 400');
+            } else {
+                alert('Error');
+            }
+        }
+    };
+
+    xmlhttp.open("POST", url, true);
+    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xmlhttp.send('value=' + value);
+}
+
+
+
+// Query Get Ajax
 
 function paginationPages() {
     var clickTable = document.getElementsByClassName('pagination-item');
@@ -214,9 +243,9 @@ function deleteFunction(post_id) {
     for (var i = 0; i < deleteButton.length; i++) {
         var element = deleteButton[i];
         element.onclick = function () {
-           var json = JSON.parse(this.parentNode.parentNode.getAttribute('data-value'));
-           json = JSON.stringify(json);
-           deleteRecord(post_id, this.parentNode.parentNode, json);
+            var json = JSON.parse(this.parentNode.parentNode.getAttribute('data-value'));
+            json = JSON.stringify(json);
+            deleteRecord(post_id, this.parentNode.parentNode, json);
         }
     }
 }
@@ -226,16 +255,192 @@ function deleteFunction(post_id) {
 
 var addInput = document.getElementsByClassName('add-input');
 var addObject = document.getElementsByClassName('type');
+var i = 1;
+
+if (addInput.length > 0) {
+    addInput[0].onclick = function (e) {
+        e.preventDefault();
+        var copy = addObject[0].cloneNode(true);
+        copy.childNodes[2].setAttribute('name', 'recordName[' + i + ']');
+        copy.childNodes[4].setAttribute('name', 'recordType[' + i + ']');
+        document.getElementById('add-table-form').appendChild(copy);
+        i++;
+    }
+}
+
+// ADD table form add new value
 
 
-addInput[0].onclick = function(e) {
-    e.preventDefault();
-    var copy = addObject[0].cloneNode(true);
-    document.getElementById('add-table-form').appendChild(copy);
+
+var addTableSubmit = document.getElementById('add-table-submit');
+
+if (addTableSubmit != null || addTableSubmit != undefined) {
+    addTableSubmit.onclick = function (e) {
+        e.preventDefault();
+        var form = JSON.stringify(serialize(this.parentNode));
+        createTable("api/createTable.php", form);
+
+
+    }
+}
+
+// Create table submit
+
+function createTable(url, formValue) {
+
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function () {
+        if (xmlhttp.readyState == XMLHttpRequest.DONE) { // XMLHttpRequest.DONE == 4
+            if (xmlhttp.status == 200) {
+                document.getElementById("info").innerHTML = xmlhttp.responseText;
+            } else if (xmlhttp.status == 400) {
+                alert('Error 400');
+            } else {
+                alert('Error');
+            }
+        }
+    };
+
+    xmlhttp.open("POST", url, true);
+    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xmlhttp.send('value=' + formValue);
+
 }
 
 
 
+// Create table submit
 
 
-// ADD table form add new value
+var deleteButtons = document.getElementsByClassName('deleteTable');
+
+if (deleteButtons) {
+    for (var i = 0; i < deleteButtons.length; i++) {
+
+        deleteButtons[i].onclick = function () {
+            deleteTable('api/deleteTable.php', this.getAttribute('data-value'));
+            this.parentNode.remove();
+        };
+    }
+}
+
+
+// Delete table
+
+function deleteTable(url, id) {
+
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function () {
+        if (xmlhttp.readyState == XMLHttpRequest.DONE) { // XMLHttpRequest.DONE == 4
+            if (xmlhttp.status == 200) {
+                document.getElementById("info").innerHTML = xmlhttp.responseText;
+                document.getElementById("table-content").innerHTML = '';
+            } else if (xmlhttp.status == 400) {
+                alert('Error 400');
+            } else {
+                alert('Error');
+            }
+        }
+    };
+
+    xmlhttp.open("POST", url, true);
+    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xmlhttp.send('id=' + id);
+
+}
+
+// DELETE TABLE AJAX
+
+function addRecord() {
+    var addRecordButton = document.getElementById('addRecordButton');
+    var addRecordInputs = document.getElementsByClassName('addRecordInputs');
+    if (addRecordButton) {
+        addRecordButton.onclick = function (e) {
+            e.preventDefault();
+            var inputValues = [];
+            for (var i = 0; i < addRecordInputs.length; i++) {
+                inputValues.push(addRecordInputs[i].value);
+            }
+     
+            addRecordAjax('api/addRecord.php', inputValues);
+        }
+
+    }
+}
+
+
+// Add record button
+
+function addRecordAjax(url, value) {
+    
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.onreadystatechange = function () {
+            if (xmlhttp.readyState == XMLHttpRequest.DONE) { // XMLHttpRequest.DONE == 4
+                if (xmlhttp.status == 200) {
+                    document.getElementById("info").innerHTML = xmlhttp.responseText;
+                    document.getElementById("table-content").innerHTML = '';
+                    // Tutaj APPEND
+                } else if (xmlhttp.status == 400) {
+                    alert('Error 400');
+                } else {
+                    alert('Error');
+                }
+            }
+        };
+    
+        xmlhttp.open("POST", url, true);
+        xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xmlhttp.send('value=' + value);
+    
+    }
+
+    // Add record ajax
+
+var serialize = (function (slice) {
+    return function (form) {
+        //no form, no serialization
+        if (form == null)
+            return null;
+
+        //get the form elements and convert to an array
+        return slice.call(form.elements)
+            .filter(function (element) {
+                //remove disabled elements
+                return !element.disabled;
+            }).filter(function (element) {
+                //remove unchecked checkboxes and radio buttons
+                return !/^input$/i.test(element.tagName) || !/^(?:checkbox|radio)$/i.test(element.type) || element.checked;
+            }).filter(function (element) {
+                //remove <select multiple> elements with no values selected
+                return !/^select$/i.test(element.tagName) || element.selectedOptions.length > 0;
+            }).map(function (element) {
+                switch (element.tagName.toLowerCase()) {
+                    case 'checkbox':
+                    case 'radio':
+                        return {
+                            name: element.name,
+                            value: element.value === null ? 'on' : element.value
+                        };
+                    case 'select':
+                        if (element.multiple) {
+                            return {
+                                name: element.name,
+                                value: slice.call(element.selectedOptions)
+                                    .map(function (option) {
+                                        return option.value;
+                                    })
+                            };
+                        }
+                        return {
+                            name: element.name,
+                            value: element.value
+                        };
+                    default:
+                        return {
+                            name: element.name,
+                            value: element.value || ''
+                        };
+                }
+            });
+    }
+}(Array.prototype.slice));

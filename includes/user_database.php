@@ -149,7 +149,7 @@
                     endif;
 
                     if($i == $loop - 1):
-                        $query .= $key."=?";
+                        $query .= $key."=? LIMIT 1";
                     else:
                         $query .= $key."=? AND ";
                     endif;
@@ -165,8 +165,8 @@
                 if($stmt = $this->DB->prepare($query)):
                     $stmt->bind_param($types, ...$where_array);
                     $stmt->execute();
-                  
-                    return true;
+                    
+                    return mysqli_affected_rows($this->DB);
                 else:
                     return $this->DB->errno;             
                 endif;
@@ -225,6 +225,85 @@
             } else {
                 return false;
             }
+        }
+
+        public function createTable($data) {
+            if($this->isConnected()) {
+                $query = "CREATE TABLE ".$data[0]['value']." (";
+                
+                for($i = 1; $i < sizeof($data); $i++):
+                    if($i % 2 == 1):
+                        $query.= $data[$i]['value']." "; 
+                    else:
+                        if($i != (sizeof($data)-1)):
+                            $query.=$data[$i]['value'].",";
+                        else :
+                            $query.=$data[$i]['value']." )";
+                        endif;
+                    endif;
+                endfor;
+
+                if($stmt = $this->DB->prepare($query)):
+                    $stmt->execute();
+                  
+                    return "Zaktualizowany rekord";
+                else:
+                    return $this->DB->error;             
+                endif;
+                        
+
+            } else {
+                return "Nie mozna polaczyc sie z baza danych";
+            }
+        }
+
+
+        public function deleteTable($id) {
+            if($this->isConnected()) {
+              $query = "DROP TABLE ".$id;
+                if($stmt = $this->DB->prepare($query)):
+                    $stmt->execute();
+                  
+                    return "Usunięto tabelę ".$id;
+                else:
+                    return $this->DB->error;             
+                endif;
+                        
+
+            } else {
+                return "Nie mozna polaczyc sie z baza danych";
+            }
+        }
+
+        public function querySelect($query) {
+            if($this->isConnected()) {      
+                if($stmt = $this->DB->prepare($query)):
+                    $stmt->execute();
+                    
+                    $res = $stmt->get_result();
+
+                    $result = array();
+                     
+                    if(is_array($res)):
+                        while($row = $res->fetch_assoc())
+                            $result[] = $row;
+                        return $result;
+                    else: 
+                        return "Zapytanie wykonane pomyslnie";
+                    endif;
+               
+                else:
+                    return $this->DB->error;             
+                endif;
+                        
+
+            } else {
+                return "Nie mozna polaczyc sie z baza danych";
+            }
+        }
+
+        public function returnDB() {
+            return $this->DB;
         }
 
         function __construct($host, $user, $password, $dbName) {

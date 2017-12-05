@@ -35,9 +35,10 @@
     <div class="row list-container">
         <div class="col-2">
             <?php foreach($TABLES_LIST as $key=>$value): ?>
-            <div class="table-item" data-id="<?php echo $value ?>">
+            <div >
+            
                 <p>
-                    <?php echo $value?>
+                <button class="deleteTable" data-value="<?php echo $value ?>">X</button><span class="table-item" data-id="<?php echo $value ?>"> <?php echo $value?></span>
                 </p>
             </div>
             <?php endforeach?>

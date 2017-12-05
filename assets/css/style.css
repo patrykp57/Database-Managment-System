@@ -286,7 +286,7 @@ textarea {
     min-height: 100px;
 }
 
-.item-active p {
+.item-active  {
     color: #d3d3d3;
 }
 /* NAVBAR */
